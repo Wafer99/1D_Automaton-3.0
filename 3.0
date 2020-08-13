@@ -1,0 +1,95 @@
+import pygame
+import itertools
+import random
+
+# initiate pygame
+pygame.init()
+
+# define the colors
+white = (255, 255, 255)
+black = (0, 0, 0)
+
+#screen size
+height = 500
+width = 500
+
+#other settings
+c_color = black
+d_color = white
+cell = 2
+density_of_alive_cells = 500
+number_of_cells = 250
+
+#creates the standard sequence
+x = [True, False]
+sequence_building = [p for p in itertools.product(x, repeat=3)]
+item_in_sequence = len(sequence_building)
+sequence = []
+for i in range(0, item_in_sequence):
+    sequence.append(list(sequence_building[i]))
+
+#Creates all possible combination of outcomes = all the sequence
+all_sequence_building = [p for p in itertools.product(x, repeat=8)]
+item_in_all_sequence = len(all_sequence_building)
+all_sequence = []
+for i in range(0, item_in_all_sequence):
+    all_sequence.append(list(all_sequence_building[i]))
+
+#Asks the user which rule to simulate by inputting rule Number
+while True:
+    input_rule = input("input a rule number to simulate it : ")
+    try:
+        input_rule = int(input_rule)
+        if 0 <= input_rule <= 255:
+            break
+        else:
+            print(f"You must provide a value between 0 and {255}")
+    except ValueError:
+        print(f"You must provide a value between 0 and {255}")
+
+#Checks the combination for rule number "input_rule" in "all_sequence"
+current_rule = all_sequence[input_rule][:]
+
+
+
+#Creates for line / Generation
+first_generation = []
+for k in range(0, 255):
+    first_generation = first_generation + [bool(random.getrandbits(1))]
+first_generation_2 = first_generation[:]
+
+#main loop and screen rendering
+running = True
+line = 0
+
+screen = pygame.display.set_mode((width, height))
+pygame.display.set_caption("1 Dimensional Cellular Automaton")
+
+
+#main loop starts
+while running:
+    #exiting option
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+    #main loop
+    while line <= number_of_cells:
+        first_generation = first_generation_2[:]
+        pygame.display.update()
+        for i in range(1, number_of_cells - 1):
+
+            for s in range(0, item_in_sequence):
+                #reading
+                current_state = [first_generation[i - 1], first_generation[i], first_generation[i + 1]]
+                position = sequence.index(current_state)
+            if current_rule[position]:
+                #writing
+                first_generation_2[i] = False
+                #drawing
+                pygame.draw.rect(screen, (d_color), ((i * cell), (line * cell), cell, cell))
+            else:
+                first_generation_2[i] = True
+                pygame.draw.rect(screen, (c_color), ((i * cell), (line * cell), cell, cell))
+        line = line + 1
+
+pygame.quit
